@@ -1,4 +1,4 @@
-YouTube Downloader with Video Preview
+YouTube Downloader
 
 This project is a web-based video downloader that allows users to  download in their desired format and resolution.
 
