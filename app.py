@@ -7,66 +7,54 @@ import glob
 app = Flask(__name__)
 CORS(app)
 
-# Directories for downloads and cookies
 DOWNLOAD_DIR = os.path.join(os.getcwd(), "downloads")
 if not os.path.exists(DOWNLOAD_DIR):
     os.makedirs(DOWNLOAD_DIR)
 
-COOKIES_DIR = os.path.join(os.getcwd(), "cookies")
-if not os.path.exists(COOKIES_DIR):
-    os.makedirs(COOKIES_DIR)
+# Path to the cookies file (make sure to update this path to where you saved your cookies.txt)
+COOKIES_FILE_PATH = os.path.join(os.getcwd(), 'cookies.txt')
 
 @app.route('/')
 def home():
     return jsonify({'message': 'Welcome to the YouTube Downloader API'})
 
-@app.route('/upload-cookies', methods=['POST'])
-def upload_cookies():
-    """Endpoint to upload a cookies file in Mozilla/Netscape format."""
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part in the request'}), 400
-
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-
-    if file:
-        cookies_path = os.path.join(COOKIES_DIR, file.filename)
-        file.save(cookies_path)
-        return jsonify({'message': 'Cookies file uploaded successfully', 'cookies_path': cookies_path}), 200
-
 @app.route('/download', methods=['POST'])
 def download_video():
-    """Download video with support for browser cookies."""
-    try:
-        data = request.get_json()  # Expect JSON input
-        video_url = data.get('url')
-        resolution = data.get('resolution', 'best')
-        format_type = data.get('format', 'mp4')
-        cookies_path = data.get('cookies_path')  # User-uploaded cookies path (optional)
+    data = request.json
+    video_url = data.get('url')
+    resolution = data.get('resolution', 'best')
+    format_type = data.get('format', 'mp4')
 
-        if not video_url:
-            return jsonify({'error': 'YouTube URL is required'}), 400
+    if not video_url:
+        return jsonify({'error': 'YouTube URL is required'}), 400
 
-        # Set yt-dlp options
+    if format_type == 'mp3':
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'outtmpl': f"{DOWNLOAD_DIR}/%(title)s.%(ext)s",
+            'postprocessors': [
+                {
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '192',
+                }
+            ],
+            'ffmpeg_location': '/usr/bin/ffmpeg',
+            'cookies': COOKIES_FILE_PATH,  # Pass the cookies file path here
+        }
+    else:
         ydl_opts = {
             'format': f'bestvideo[height<={resolution}]+bestaudio/best',
             'outtmpl': f"{DOWNLOAD_DIR}/%(title)s.%(ext)s",
             'merge_output_format': format_type,
             'ffmpeg_location': '/usr/bin/ffmpeg',
+            'cookies': COOKIES_FILE_PATH,  # Pass the cookies file path here
         }
 
-        # Add cookies handling
-        if cookies_path and os.path.exists(cookies_path):
-            ydl_opts['cookies'] = cookies_path  # Use uploaded cookies
-        else:
-            ydl_opts['cookiesfrombrowser'] = 'chrome'  # Use browser cookies
-
-        # Download video
+    try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([video_url])
 
-        # Find downloaded file
         downloaded_files = glob.glob(os.path.join(DOWNLOAD_DIR, f"*.{format_type}"))
         if format_type == 'mp3':
             downloaded_files += glob.glob(os.path.join(DOWNLOAD_DIR, "*.mp3"))
@@ -82,7 +70,6 @@ def download_video():
 
 @app.route('/download-file/<file_name>', methods=['GET'])
 def serve_file(file_name):
-    """Serve the downloaded file to the client."""
     file_path = os.path.join(DOWNLOAD_DIR, file_name)
     if os.path.exists(file_path):
         return send_file(file_path, as_attachment=True, download_name=file_name)
