@@ -1,0 +1,47 @@
+[
+    {
+        "name": "APISID",
+        "value": "VLbi3F8UJ-YI-H4E/AUNzGPnvcaDvJhvCl",
+        "domain": ".youtube.com",
+        "path": "/",
+        "secure": true,
+        "httpOnly": true,
+        "sameSite": "None"
+    },
+    {
+        "name": "SAPISID",
+        "value": "G2bD6VLm5FMmZxdR/A9ZfTsdUPCFG-wCBk",
+        "domain": ".youtube.com",
+        "path": "/",
+        "secure": true,
+        "httpOnly": true,
+        "sameSite": "None"
+    },
+    {
+        "name": "SID",
+        "value": "g.a000rQg-UfIN5AT8j2in5EFAuDsuLwWDvGD24mdyz8gi5pT4BdTnNooAf9DtlN3qN3FYzReB6QACgYKAbESARQSFQHGX2MiJiCv4ZYzlxgBFZp2ziwE1hoVAUF8yKp8sOi40RbQT-LbzG8cNOek0076",
+        "domain": ".youtube.com",
+        "path": "/",
+        "secure": true,
+        "httpOnly": true,
+        "sameSite": "None"
+    },
+    {
+        "name": "PREF",
+        "value": "tz=Asia.Dhaka&f7=100&f4=4000000",
+        "domain": ".youtube.com",
+        "path": "/",
+        "secure": true,
+        "httpOnly": false,
+        "sameSite": "None"
+    },
+    {
+        "name": "SIDCC",
+        "value": "AKEYXzXQLQpLuQ6xYaMZ-KI_XSEMWXUWxuDwX7_Lw2XEZrhxniaqQrDojNUGanej8Hdc0BuXur8",
+        "domain": ".youtube.com",
+        "path": "/",
+        "secure": true,
+        "httpOnly": false,
+        "sameSite": "None"
+    }
+]
