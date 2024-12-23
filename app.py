@@ -3,6 +3,7 @@ from flask_cors import CORS
 import os
 import yt_dlp
 import glob
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -25,6 +26,17 @@ def download_video():
     if not video_url:
         return jsonify({'error': 'YouTube URL is required'}), 400
 
+    # Load cookies from a file (cookies.json exported from the browser)
+    cookies_file = "cookies.json"  # Path to your cookies file
+
+    # Check if the file exists
+    if not os.path.exists(cookies_file):
+        return jsonify({'error': f'Cookies file not found: {cookies_file}'}), 400
+
+    with open(cookies_file, 'r') as file:
+        cookies = json.load(file)
+
+    # Set the ydl_opts with cookies
     if format_type == 'mp3':
         ydl_opts = {
             'format': 'bestaudio/best',
@@ -37,6 +49,7 @@ def download_video():
                 }
             ],
             'ffmpeg_location': '/usr/bin/ffmpeg',
+            'cookiefile': cookies_file,  # Pass cookies here
         }
     else:
         ydl_opts = {
@@ -44,6 +57,7 @@ def download_video():
             'outtmpl': f"{DOWNLOAD_DIR}/%(title)s.%(ext)s",
             'merge_output_format': format_type,
             'ffmpeg_location': '/usr/bin/ffmpeg',
+            'cookiefile': cookies_file,  # Pass cookies here
         }
 
     try:
@@ -73,4 +87,3 @@ def serve_file(file_name):
 
 if __name__ == '__main__':
     app.run(debug=False)
-
