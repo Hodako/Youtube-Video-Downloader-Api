@@ -1,10 +1,8 @@
-<h>YouTube Downloader with Video Preview</h>
+YouTube Downloader with Video Preview
 
-This project is a web-based YouTube downloader that allows users to preview videos using the YouTube IFrame Player API and download them in their desired format and resolution.
+This project is a web-based video downloader that allows users to  download in their desired format and resolution.
 
 Features
-
-Video Preview: Preview the selected YouTube video before downloading.
 
 Download Options: Choose video resolution (e.g., 144p, 720p, 1080p) or download as MP3.
 
@@ -22,8 +20,6 @@ HTML5, CSS3, JavaScript
 Bootstrap for styling
 
 Font Awesome for icons
-
-YouTube IFrame Player API for video previews
 
 
 Backend
