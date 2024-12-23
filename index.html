@@ -1,0 +1,143 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        h1 {
+            color: #4CAF50;
+            margin-top: 20px;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        .btn-download {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+        }
+        .btn-download:hover {
+            background-color: #45a049;
+        }
+        .loader {
+            display: none;
+            margin: 20px auto;
+        }
+        .loader i {
+            font-size: 40px;
+            color: #4CAF50;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container text-center">
+        <h1><i class="fas fa-download"></i> Hodako Video Downloader</h1>
+        <div class="form-container">
+            <form id="downloadForm">
+                <div class="mb-3">
+                    <label for="url" class="form-label">YouTube URL:</label>
+                    <input type="url" id="url" name="url" class="form-control" placeholder="Enter Video URL" required>
+                </div>
+                <div class="mb-3">
+                    <label for="resolution" class="form-label">Resolution:</label>
+                    <select id="resolution" name="resolution" class="form-select">
+                        <option value="144">144p</option>
+                        <option value="240">240p</option>
+                        <option value="360">360p</option>
+                        <option value="480">480p</option>
+                        <option value="720">720p</option>
+                        <option value="1080">1080p</option>
+                        <option value="best">Best</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="format" class="form-label">Format:</label>
+                    <select id="format" name="format" class="form-select">
+                        <option value="mp4">MP4</option>
+                        <option value="mp3">MP3</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-download w-100">
+                    <i class="fas fa-cloud-download-alt"></i> Download
+                </button>
+            </form>
+            <div class="loader" id="loader">
+                <i class="fas fa-spinner"></i>
+            </div>
+            <div id="response" class="mt-4"></div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle (includes Popper) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const form = document.getElementById('downloadForm');
+        const loader = document.getElementById('loader');
+        const responseDiv = document.getElementById('response');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            loader.style.display = 'block';
+            responseDiv.innerHTML = ''; // Clear any previous responses
+
+            const url = document.getElementById('url').value;
+            const resolution = document.getElementById('resolution').value;
+            const format = document.getElementById('format').value;
+
+            fetch('https://youtube-video-downloader-api-6uzy.onrender.com/download', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url, resolution, format })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loader.style.display = 'none';
+                if (data.file_name) {
+                    responseDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <p>Download successful!</p>
+                            <a href="http://127.0.0.1:5000/download-file/${data.file_name}" target="_blank" class="btn btn-primary">
+                                <i class="fas fa-download"></i> Download ${data.file_name}
+                            </a>
+                        </div>
+                    `;
+                } else if (data.error) {
+                    responseDiv.innerHTML = `<div class="alert alert-danger"><p>${data.error}</p></div>`;
+                }
+            })
+            .catch(error => {
+                loader.style.display = 'none';
+                responseDiv.innerHTML = `<div class="alert alert-danger"><p>Error: ${error.message}</p></div>`;
+            });
+        });
+    </script>
+
+</body>
+</html>
+
